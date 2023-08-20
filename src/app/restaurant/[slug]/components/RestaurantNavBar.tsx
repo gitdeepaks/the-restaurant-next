@@ -1,16 +1,17 @@
 import React from "react";
+import Link from "next/link";
 
 function RestaurantNavBar() {
   return (
     <nav className="flex text-reg border-b pb-2">
-      <a href="" className="mr-7">
+      <Link href="/restaurant/cnf" className="mr-7">
         {" "}
         Overview{" "}
-      </a>
-      <a href="" className="mr-7">
+      </Link>
+      <Link href="/restaurant/cnf/menu" className="mr-7">
         {" "}
         Menu{" "}
-      </a>
+      </Link>
     </nav>
   );
 }
