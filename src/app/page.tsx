@@ -1,8 +1,7 @@
 import Card from "./components/Card";
 import Header from "./components/Header";
-import NavBar from "./components/NavBar";
 
-export default function Home() {
+export default async function Home() {
   return (
     <main>
       <Header />
