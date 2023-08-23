@@ -37,3 +37,8 @@ next-env.d.ts
 #GIT Pusg Script
 push_to_git.sh
 ```
+
+#env
+.env
+
+```
