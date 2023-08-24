@@ -4,9 +4,7 @@ import RestaurantRating from "./components/RestaurantRating";
 import RestaurantDescription from "./components/RestaurantDescription";
 import RestaurantImages from "./components/RestaurantImages";
 import ReviewCard from "./components/ReviewCard";
-import { Prisma, PrismaClient } from "@prisma/client";
-import { time } from "console";
-import { title } from "process";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -24,8 +22,8 @@ interface RestaurantData {
   slug: string;
 }
 
-const fetchRestaurant = async (slug: string): Promise<RestaurantData> => {
-  const restaurant = await prisma.restaurant.findUnique({
+const fetchRestaurant = (slug: string): RestaurantData => {
+  const restaurant = prisma.restaurant.findUnique({
     where: {
       slug,
     },
@@ -44,7 +42,6 @@ const fetchRestaurant = async (slug: string): Promise<RestaurantData> => {
 
   return restaurant;
 };
-
 export default async function RestaurantDetailsPage({ params }: Props) {
   const restaurant = await fetchRestaurant(params.slug);
   console.log(restaurant);
