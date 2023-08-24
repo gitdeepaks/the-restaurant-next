@@ -22,8 +22,8 @@ interface RestaurantData {
   slug: string;
 }
 
-const fetchRestaurant = (slug: string): RestaurantData => {
-  const restaurant = prisma.restaurant.findUnique({
+const fetchRestaurant = async (slug: string): Promise<RestaurantData> => {
+  const restaurant = await prisma.restaurant.findUnique({
     where: {
       slug,
     },
