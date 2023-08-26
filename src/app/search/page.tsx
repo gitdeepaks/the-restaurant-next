@@ -54,8 +54,9 @@ const fetchRestaurants = (searchParams: searchParams) => {
     main_image: true,
     price: true,
     location: true,
-    slug: true,
     region: true,
+    slug: true,
+    reviews: true,
   };
 
   return prisma.restaurant.findMany({

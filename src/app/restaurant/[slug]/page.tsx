@@ -4,7 +4,7 @@ import RestaurantRating from "./components/RestaurantRating";
 import RestaurantDescription from "./components/RestaurantDescription";
 import RestaurantImages from "./components/RestaurantImages";
 import ReviewCard from "./components/ReviewCard";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Review } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +20,7 @@ interface RestaurantData {
   images: string[];
   description: string;
   slug: string;
+  reviews: Review[];
 }
 
 const fetchRestaurant = async (slug: string): Promise<RestaurantData> => {
@@ -33,6 +34,7 @@ const fetchRestaurant = async (slug: string): Promise<RestaurantData> => {
       description: true,
       images: true,
       slug: true,
+      reviews: true,
     },
   });
 
@@ -52,7 +54,7 @@ export default async function RestaurantDetailsPage({ params }: Props) {
 
         <RestaurantTitle title={restaurant.name} />
 
-        <RestaurantRating />
+        <RestaurantRating reviews={restaurant.reviews} />
 
         <RestaurantDescription description={restaurant.description} />
 
@@ -60,10 +62,14 @@ export default async function RestaurantDetailsPage({ params }: Props) {
 
         <div>
           <h1 className="font-bold text-3xl mt-10 mb-7 borber-b pb-5">
-            What 100 people are saying
+            What {restaurant.reviews.length}
+            {""} {restaurant.reviews.length === 1 ? "person" : "people"} are
+            saying
           </h1>
           <div>
-            <ReviewCard />
+            {restaurant.reviews.map((review) => (
+              <ReviewCard review={review} key={review.id} />
+            ))}
           </div>
         </div>
       </div>

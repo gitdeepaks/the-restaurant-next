@@ -1,5 +1,7 @@
 import RestaurantPrice from "@/app/components/Price";
-import { Location, PRICE, Region } from "@prisma/client";
+import { calculateReviewAverage } from "@/utils/calculateReviewAverage";
+import { Location, PRICE, Region, Review } from "@prisma/client";
+import { calculateOverrideValues } from "next/dist/server/font-utils";
 import Link from "next/link";
 import React from "react";
 
@@ -11,9 +13,17 @@ interface RetaurantProps {
   price: PRICE;
   location: Location;
   region: Region;
+  reviews: Review[];
 }
 
 function RestaurantCart({ restaurant }: { restaurant: RetaurantProps }) {
+  const renderReviews = () => {
+    const rating = calculateReviewAverage(restaurant.reviews);
+    if (rating > 4) return "Awesome";
+    else if (rating <= 4 && rating > 3) return "Good";
+    else if (rating <= 3 && rating > 0) return "Average";
+    else return "";
+  };
   return (
     <div className="border-b flex pb-5">
       <img src={restaurant.main_image} alt="" className="w-44 rounded" />
@@ -21,7 +31,7 @@ function RestaurantCart({ restaurant }: { restaurant: RetaurantProps }) {
         <h2 className="text-3xl">{restaurant.name}</h2>
         <div className="flex items-start">
           <div className="flex mb-2 text-black">*****</div>
-          <p className="ml-2 text-sm text-black">Awesome</p>
+          <p className="ml-2 text-sm text-black">{renderReviews()}</p>
         </div>
         <div className="mb-9">
           <div className="font-light flex text-reg">
