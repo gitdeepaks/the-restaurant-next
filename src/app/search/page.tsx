@@ -13,7 +13,41 @@ export const metadata: Metadata = {
 
 const prisma = new PrismaClient();
 
-const fetchRestaurants = (city: string | undefined) => {
+interface searchParams {
+  city?: string;
+  region?: string;
+  price?: PRICE;
+}
+
+const fetchRestaurants = (searchParams: searchParams) => {
+  const where: any = {};
+
+  if (searchParams.city) {
+    const location = {
+      name: {
+        equals: searchParams.city.toLocaleLowerCase(),
+      },
+    };
+
+    where.location = location;
+  }
+  if (searchParams.region) {
+    const region = {
+      name: {
+        equals: searchParams.region.toLocaleLowerCase(),
+      },
+    };
+
+    where.region = region;
+  }
+
+  if (searchParams.price) {
+    const price = {
+      equals: searchParams.price,
+    };
+    where.price = price;
+  }
+
   const select = {
     id: true,
     name: true,
@@ -23,17 +57,9 @@ const fetchRestaurants = (city: string | undefined) => {
     slug: true,
     region: true,
   };
-  if (!city) {
-    return prisma.restaurant.findMany({ select });
-  }
+
   return prisma.restaurant.findMany({
-    where: {
-      location: {
-        name: {
-          equals: city.toLocaleLowerCase(),
-        },
-      },
-    },
+    where,
     select,
   });
 };
@@ -49,9 +75,9 @@ const fetchRegions = () => {
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: { city?: string; region?: string; price?: PRICE };
+  searchParams: searchParams;
 }) {
-  const restaurants = await fetchRestaurants(searchParams.city);
+  const restaurants = await fetchRestaurants(searchParams);
 
   const locations = await fetchLoactions();
 
