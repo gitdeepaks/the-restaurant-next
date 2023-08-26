@@ -49,7 +49,7 @@ export default async function RestaurantDetailsPage({ params }: Props) {
   console.log(restaurant);
   return (
     <>
-      <div className="bg-white w-[70%] rounded p-3 shadow">
+      <div className="bg-slate-50 w-[70%] rounded p-3 shadow">
         <RestaurantNavBar slug={restaurant.slug} />
 
         <RestaurantTitle title={restaurant.name} />
