@@ -18,9 +18,10 @@ function SearchBox() {
       <button
         className="rounded bg-red-600 px-9 py-2 text-white"
         onClick={() => {
-          if (location === "banana") return null;
+          if (location === "") return null;
 
-          router.push("/search");
+          router.push(`/search?city=${location}`);
+          setLocation("");
         }}
       >
         Let's go

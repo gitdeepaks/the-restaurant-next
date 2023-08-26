@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar";
 import Header from "./components/Header";
 import RestaurantCart from "./components/RestaurantCart";
 import SideBar from "./components/SideBar";
+import { PrismaClient } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -10,14 +11,54 @@ export const metadata: Metadata = {
   keywords: ["deepak", "page"],
 };
 
-export default function SearchPage() {
+const prisma = new PrismaClient();
+
+const fetchRestaurants = (city: string | undefined) => {
+  const select = {
+    id: true,
+    name: true,
+    main_image: true,
+    price: true,
+    location: true,
+    slug: true,
+    region: true,
+  };
+
+  if (!city) {
+    return prisma.restaurant.findMany({ select });
+  }
+  return prisma.restaurant.findMany({
+    where: {
+      location: {
+        name: {
+          equals: city.toLocaleLowerCase(),
+        },
+      },
+    },
+    select,
+  });
+};
+
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: { city: string };
+}) {
+  const restaurants = await fetchRestaurants(searchParams.city);
+  console.log(restaurants);
   return (
     <>
       <Header />
       <div className="flex py-4 m-auto w-2/3 justify-between items-start">
         <SideBar />
         <div className="w-5/6">
-          <RestaurantCart />
+          {restaurants.length ? (
+            restaurants.map((restaurant) => (
+              <RestaurantCart restaurant={restaurant} />
+            ))
+          ) : (
+            <p>sorry no retaurant was found</p>
+          )}
         </div>
       </div>
     </>
