@@ -1,4 +1,5 @@
 import RestaurantPrice from "@/app/components/Price";
+import Stars from "@/app/restaurant/[slug]/components/Stars";
 import { calculateReviewAverage } from "@/utils/calculateReviewAverage";
 import { Location, PRICE, Region, Review } from "@prisma/client";
 import { calculateOverrideValues } from "next/dist/server/font-utils";
@@ -30,7 +31,7 @@ function RestaurantCart({ restaurant }: { restaurant: RetaurantProps }) {
       <div className="pl-5">
         <h2 className="text-3xl">{restaurant.name}</h2>
         <div className="flex items-start">
-          <div className="flex mb-2 text-black">*****</div>
+          <Stars reviews={restaurant.reviews} />
           <p className="ml-2 text-sm text-black">{renderReviews()}</p>
         </div>
         <div className="mb-9">
