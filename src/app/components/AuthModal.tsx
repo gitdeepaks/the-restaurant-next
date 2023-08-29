@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const style = {
   position: "absolute" as "absolute",
@@ -19,14 +20,37 @@ const style = {
   p: 4,
 };
 
+interface formData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  city: string;
+  phoneNumber: string;
+}
+
 export default function AuthModal({ isSignin }: { isSignin: boolean }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<formData>({
+    defaultValues: {
+      firstName: "Deepak",
+      lastName: "Sankhyan",
+      email: "deepak@yahoo.com",
+      city: "Jaipur",
+      phoneNumber: "1234567890",
+    },
+  });
 
   const renderContent = (signInContent: string, signUpContent: string) => {
     return isSignin ? signInContent : signUpContent;
   };
+
+  const onSubmit: SubmitHandler<formData> = (data) => console.log(data);
 
   return (
     <div>
@@ -57,8 +81,11 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
                 {renderContent("Log into your account", "Create your Account")}
               </h2>
             </div>
-            <AuthModelInput />
-            <button className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400">
+            <AuthModelInput register={register} errors={errors} />
+            <button
+              onClick={handleSubmit(onSubmit)}
+              className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
+            >
               {renderContent("Sign in", "Create Account")}
             </button>
           </div>
