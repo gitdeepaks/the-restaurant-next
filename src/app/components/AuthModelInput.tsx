@@ -1,21 +1,12 @@
 import { FieldErrors, UseFormRegister } from "react-hook-form";
-
-// Define the formData type
-interface formData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  city: string;
-  phoneNumber: string;
-  password: string;
-}
+import { FormData } from "../../../formDataTypes";
 
 function AuthModelInput({
   register,
   errors,
 }: {
-  register: UseFormRegister<formData>;
-  errors: FieldErrors<formData>;
+  register: UseFormRegister<FormData>;
+  errors: FieldErrors<FormData>;
 }) {
   return (
     <>

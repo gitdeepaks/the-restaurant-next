@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { FormData } from "../../../formDataTypes";
 
 const style = {
   position: "absolute" as "absolute",
@@ -20,13 +21,13 @@ const style = {
   p: 4,
 };
 
-interface formData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  city: string;
-  phoneNumber: string;
-}
+// interface formData {
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   city: string;
+//   phoneNumber: string;
+// }
 
 export default function AuthModal({ isSignin }: { isSignin: boolean }) {
   const [open, setOpen] = useState(false);
@@ -36,7 +37,7 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<formData>({
+  } = useForm<FormData>({
     defaultValues: {
       firstName: "Deepak",
       lastName: "Sankhyan",
@@ -50,7 +51,7 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
     return isSignin ? signInContent : signUpContent;
   };
 
-  const onSubmit: SubmitHandler<formData> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
 
   return (
     <div>
