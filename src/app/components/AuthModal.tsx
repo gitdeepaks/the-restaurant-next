@@ -21,14 +21,6 @@ const style = {
   p: 4,
 };
 
-// interface formData {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   city: string;
-//   phoneNumber: string;
-// }
-
 export default function AuthModal({ isSignin }: { isSignin: boolean }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
