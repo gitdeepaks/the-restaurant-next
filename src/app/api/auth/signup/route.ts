@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import validator from "validator";
 import { FormData } from "../../../../../formDataTypes";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 export function GET() {
   return NextResponse.json({
@@ -64,5 +65,7 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json({ res });
+  const hashedPassword = await bcrypt.hash(res.password, 10);
+
+  return NextResponse.json({ res, hashedPassword });
 }
