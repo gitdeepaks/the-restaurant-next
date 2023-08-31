@@ -3,6 +3,7 @@ import validator from "validator";
 import { FormData } from "../../../../../formDataTypes";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
+import * as jose from "jose";
 
 export function GET() {
   return NextResponse.json({
@@ -67,5 +68,26 @@ export async function POST(request: Request) {
 
   const hashedPassword = await bcrypt.hash(res.password, 10);
 
-  return NextResponse.json({ res, hashedPassword });
+  const user = await prisma.user.create({
+    data: {
+      first_name: res.firstName,
+      last_name: res.lastName,
+      email: res.email,
+      city: res.city,
+      phone: String(res.phoneNumber),
+      password: hashedPassword,
+    },
+  });
+
+  const alg = "HS256";
+  const signature = new TextEncoder().encode(process.env.JWT_SECRET);
+
+  const token = await new jose.SignJWT({
+    email: res.email,
+  })
+    .setProtectedHeader({ alg })
+    .setExpirationTime("24h")
+    .sign(signature);
+
+  return NextResponse.json({ res: user, token });
 }
