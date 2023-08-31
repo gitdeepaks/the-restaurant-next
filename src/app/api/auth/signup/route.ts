@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import validator from "validator";
 import { FormData } from "../../../../../formDataTypes";
+import { PrismaClient } from "@prisma/client";
 
 export function GET() {
   return NextResponse.json({
     id: "signup",
   });
 }
+
+const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const res: FormData = await request.json();
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
       errorMessages: "Email is not valid",
     },
     {
-      valid: validator.isMobilePhone(res.phoneNumber),
+      valid: validator.isMobilePhone(String(res.phoneNumber)),
       errorMessages: "Phone Number is not valid",
     },
     {
@@ -47,6 +50,18 @@ export async function POST(request: Request) {
 
   if (errors.length) {
     return NextResponse.json({ errorMessages: errors[0] });
+  }
+
+  const userWithEmail = await prisma.user.findUnique({
+    where: {
+      email: res.email,
+    },
+  });
+
+  if (userWithEmail) {
+    return NextResponse.json({
+      errorMessages: "email address alredy is there with another account",
+    });
   }
 
   return NextResponse.json({ res });

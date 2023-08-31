@@ -3,6 +3,6 @@ export interface FormData {
   lastName: string;
   email: string;
   city: string;
-  phoneNumber: string;
+  phoneNumber: number;
   password: string;
 }
