@@ -7,6 +7,7 @@ function AuthModelInput({
 }: {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
+  isSignin: boolean;
 }) {
   return (
     <>

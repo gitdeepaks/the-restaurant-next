@@ -35,7 +35,7 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
       lastName: "Sankhyan",
       email: "deepak@yahoo.com",
       city: "Jaipur",
-      phoneNumber: "1234567890",
+      phoneNumber: 1234567890,
     },
   });
 
@@ -74,7 +74,11 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
                 {renderContent("Log into your account", "Create your Account")}
               </h2>
             </div>
-            <AuthModelInput register={register} errors={errors} />
+            <AuthModelInput
+              register={register}
+              errors={errors}
+              isSignin={isSignin}
+            />
             <button
               onClick={handleSubmit(onSubmit)}
               className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
