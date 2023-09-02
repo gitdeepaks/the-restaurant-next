@@ -8,15 +8,15 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
   const headerInstance = headers();
-  const Bearertoken = headerInstance.get("authorization");
+  const BearerToken = headerInstance.get("authorization");
 
-  if (!Bearertoken) {
+  if (!BearerToken) {
     return NextResponse.json({
       errorMessage: "Invalid credentials",
     });
   }
 
-  const token = Bearertoken.split(" ")[1];
+  const token = BearerToken.split(" ")[1];
 
   if (!token) {
     return NextResponse.json({
