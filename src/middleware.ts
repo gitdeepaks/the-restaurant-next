@@ -6,7 +6,10 @@ export default async function middleware(request: NextRequest) {
 
   if (!BearerToken) {
     return new NextResponse(
-      JSON.stringify({ errorMessage: "Bearer Token is not Defined" })
+      JSON.stringify({ errorMessage: "Bearer Token is not Defined" }),
+      {
+        status: 401,
+      }
     );
   }
 
@@ -14,7 +17,8 @@ export default async function middleware(request: NextRequest) {
 
   if (!token) {
     return new NextResponse(
-      JSON.stringify({ errorMessage: "Token not found" })
+      JSON.stringify({ errorMessage: "Token not found" }),
+      { status: 401 }
     );
   }
 
@@ -24,7 +28,8 @@ export default async function middleware(request: NextRequest) {
     await jose.jwtVerify(token, signature);
   } catch (error) {
     return new NextResponse(
-      JSON.stringify({ errorMessage: "Invalid Request" })
+      JSON.stringify({ errorMessage: "Invalid Request" }),
+      { status: 401 }
     );
   }
 }

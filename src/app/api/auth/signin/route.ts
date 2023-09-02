@@ -1,4 +1,3 @@
-import { NextApiRequest } from "next";
 import validator from "validator";
 import { FormData } from "../../../../../formDataTypes";
 import { PrismaClient } from "@prisma/client";
@@ -14,7 +13,7 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Response) {
   const res: FormData = await request.json();
 
   const errors: string[] = [];
@@ -39,7 +38,9 @@ export async function POST(request: Request) {
   });
 
   if (errors.length) {
-    return NextResponse.json({ errorMessage: errors[0] });
+    return new NextResponse(JSON.stringify({ errorMessage: errors[0] }), {
+      status: 400,
+    });
   }
 
   const userWithEmail = await prisma.user.findUnique({
@@ -49,17 +50,19 @@ export async function POST(request: Request) {
   });
 
   if (!userWithEmail) {
-    return NextResponse.json({
-      errorMessage: "Account not found",
-    });
+    return new NextResponse(
+      JSON.stringify({ errorMessage: "Invalid credentials" }),
+      { status: 400 }
+    );
   }
 
   const isMatch = await bcrypt.compare(res.password, userWithEmail.password);
 
   if (!isMatch) {
-    return NextResponse.json({
-      errorMessage: "Invalid credentials",
-    });
+    return new NextResponse(
+      JSON.stringify({ errorMessage: "Invalid credentials" }),
+      { status: 400 }
+    );
   }
 
   const alg = "HS256";
