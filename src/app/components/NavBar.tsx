@@ -10,8 +10,8 @@ export default function NavBar() {
       </Link>
       <div>
         <div className="flex">
-          <AuthModal isSignin={true} />
-          <AuthModal isSignin={false} />
+          <AuthModal isSignIn={true} />
+          <AuthModal isSignIn={false} />
         </div>
       </div>
     </nav>

@@ -8,6 +8,8 @@ import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { FormData } from "../../../formDataTypes";
+import useAuth from "@/hooks/useAuth";
+import { isDataView } from "util/types";
 
 const style = {
   position: "absolute" as "absolute",
@@ -21,7 +23,7 @@ const style = {
   p: 4,
 };
 
-export default function AuthModal({ isSignin }: { isSignin: boolean }) {
+export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -29,21 +31,17 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
-    defaultValues: {
-      firstName: "Deepak",
-      lastName: "Sankhyan",
-      email: "deepak@yahoo.com",
-      city: "Jaipur",
-      phoneNumber: 1234567890,
-    },
-  });
+  } = useForm();
+
+  const { signin } = useAuth();
 
   const renderContent = (signInContent: string, signUpContent: string) => {
-    return isSignin ? signInContent : signUpContent;
+    return isSignIn ? signInContent : signUpContent;
   };
 
-  const onSubmit: SubmitHandler<FormData> = (data) => console.log(data);
+  const onSubmit = (data: any) => {
+    isSignIn ? signin(data) : console.log("sign up", data);
+  };
 
   return (
     <div>
@@ -77,7 +75,7 @@ export default function AuthModal({ isSignin }: { isSignin: boolean }) {
             <AuthModelInput
               register={register}
               errors={errors}
-              isSignin={isSignin}
+              isSignIn={isSignIn}
             />
             <button
               onClick={handleSubmit(onSubmit)}
