@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -10,6 +10,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { FormData } from "../../../formDataTypes";
 import useAuth from "@/hooks/useAuth";
 import { isDataView } from "util/types";
+import { AuthenticationContext } from "../context/AuthContext";
 
 const style = {
   position: "absolute" as "absolute",
@@ -24,6 +25,10 @@ const style = {
 };
 
 export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
+  const { error, loading, data, setAuthState } = useContext(
+    AuthenticationContext
+  );
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -69,7 +74,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
             </div>
             <div className="m-auto">
               <h2 className="text2xl fontlight text-center">
-                {renderContent("Log into your account", "Create your Account")}
+                {renderContent(error, "Create your Account")}
               </h2>
             </div>
             <AuthModelInput
@@ -78,7 +83,10 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
               isSignIn={isSignIn}
             />
             <button
-              onClick={handleSubmit(onSubmit)}
+              // onClick={handleSubmit(onSubmit)}
+              onClick={() =>
+                setAuthState({ loading, data, error: "clicked bye bye" })
+              }
               className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
             >
               {renderContent("Sign in", "Create Account")}
