@@ -92,5 +92,27 @@ export async function POST(request: Request) {
     .setExpirationTime("24h")
     .sign(signature);
 
-  return NextResponse.json({ res: user, token });
+  const resp = NextResponse.json(
+    {
+      id: user.id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      city: user.city,
+      phoneNumber: user.phone,
+      email: user.email,
+      hashedPassword: user.password,
+    },
+    { status: 200 }
+  );
+
+  resp.cookies.set({
+    name: "token",
+    value: token,
+    path: "/",
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+
+  return resp;
 }

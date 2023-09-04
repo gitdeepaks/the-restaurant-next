@@ -60,7 +60,7 @@ export async function POST(request: Response) {
 
   if (!isMatch) {
     return new NextResponse(
-      JSON.stringify({ errorMessage: "Invalid credentials" }),
+      JSON.stringify({ errorMessage: "Invalid credentials for Password" }),
       { status: 400 }
     );
   }
@@ -74,5 +74,22 @@ export async function POST(request: Response) {
     .setExpirationTime("24h")
     .sign(signature);
 
-  return NextResponse.json({ token });
+  const response = NextResponse.json(
+    {
+      id: userWithEmail.id,
+      firstName: userWithEmail.first_name,
+      lastName: userWithEmail.last_name,
+      city: userWithEmail.city,
+      phoneNumber: userWithEmail.phone,
+      email: userWithEmail.email,
+    },
+    { status: 200 }
+  );
+  response.cookies.set({
+    name: "jwt",
+    value: token,
+    maxAge: 60 * 60 * 24,
+    httpOnly: true,
+  });
+  return response;
 }
