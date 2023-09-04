@@ -95,7 +95,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
                 onClick={handleSubmit(onSubmit)}
                 className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
               >
-                {renderContent("Sign in", "Create Account")}
+                {renderContent("Sign Up", "Create Account")}
               </Button>
             </div>
           )}
