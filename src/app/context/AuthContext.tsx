@@ -14,7 +14,7 @@ export default function AuthContext({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<State>({
     loading: false,
     data: null,
-    error: "this is from authcontext",
+    error: null,
   });
   return (
     <AuthenticationContext.Provider value={{ ...authState, setAuthState }}>

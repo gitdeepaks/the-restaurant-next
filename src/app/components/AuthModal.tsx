@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useContext } from "react";
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { FormData } from "../../../formDataTypes";
+import { useForm } from "react-hook-form";
 import useAuth from "@/hooks/useAuth";
-import { isDataView } from "util/types";
-import { AuthenticationContext } from "../context/AuthContext";
+import useAuthContext from "@/hooks/useAuthContext";
+import { Alert, CircularProgress } from "@mui/material";
 
 const style = {
   position: "absolute" as "absolute",
@@ -25,10 +24,7 @@ const style = {
 };
 
 export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
-  const { error, loading, data, setAuthState } = useContext(
-    AuthenticationContext
-  );
-
+  const { loading, error, data } = useAuthContext();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -50,7 +46,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
 
   return (
     <div>
-      <button
+      <Button
         onClick={handleOpen}
         className={`${renderContent(
           "bg-blue-400 text-white",
@@ -58,7 +54,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
         )} border p-1 px-4 rounded mr-3`}
       >
         {renderContent("Sign in", "Sign up")}
-      </button>
+      </Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -66,32 +62,43 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <div className="p-2 h-[600px]">
-            <div className="uppercase font-bold text-center pb-2 border-b mb-2">
-              <p className="text-sm">
+          {loading ? (
+            <div className="text-blue-600 py-24 p-2 h-[600px] flex justify-center">
+              <CircularProgress />
+            </div>
+          ) : (
+            <div className="p-2 h-[600px]">
+              {error ? (
+                <Alert severity="error" className="mb-4 text-center">
+                  {error}
+                </Alert>
+              ) : null}
+              <div className="uppercase font-bold text-center pb-2 border-b mb-2">
+                <Typography variant="body2">
+                  {renderContent("Sign In", "Sign Up")}
+                </Typography>
+              </div>
+              <div className="m-auto">
+                <Typography variant="h5" align="center">
+                  {renderContent(
+                    "Log into your Account",
+                    "Create your Account"
+                  )}
+                </Typography>
+              </div>
+              <AuthModelInput
+                register={register}
+                errors={errors}
+                isSignIn={isSignIn}
+              />
+              <Button
+                onClick={handleSubmit(onSubmit)}
+                className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
+              >
                 {renderContent("Sign in", "Create Account")}
-              </p>
+              </Button>
             </div>
-            <div className="m-auto">
-              <h2 className="text2xl fontlight text-center">
-                {renderContent(error, "Create your Account")}
-              </h2>
-            </div>
-            <AuthModelInput
-              register={register}
-              errors={errors}
-              isSignIn={isSignIn}
-            />
-            <button
-              // onClick={handleSubmit(onSubmit)}
-              onClick={() =>
-                setAuthState({ loading, data, error: "clicked bye bye" })
-              }
-              className="uppercase bg-red-700 w-full text-white p-3 rounded text-sm mb-5 disabled:bg-gray-400"
-            >
-              {renderContent("Sign in", "Create Account")}
-            </button>
-          </div>
+          )}
         </Box>
       </Modal>
     </div>
