@@ -30,6 +30,11 @@ export async function GET(request: Request) {
   });
 
   return NextResponse.json({
-    id: user,
+    id: user?.id,
+    firstName: user?.first_name,
+    lastName: user?.last_name,
+    email: user?.email,
+    city: user?.city,
+    phoneNumber: user?.phone,
   });
 }

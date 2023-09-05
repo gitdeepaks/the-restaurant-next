@@ -108,7 +108,6 @@ export async function POST(request: Request) {
     name: "jwt",
     value: token,
     maxAge: 60 * 60 * 24,
-    httpOnly: true,
   });
 
   return resp;
