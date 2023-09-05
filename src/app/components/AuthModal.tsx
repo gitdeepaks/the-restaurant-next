@@ -6,11 +6,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
-import { FieldErrors, UseFormRegister, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import useAuth from "@/hooks/useAuth";
 import useAuthContext from "@/hooks/useAuthContext";
 import { Alert, CircularProgress } from "@mui/material";
-import { type } from "os";
 import { FormData } from "../../../formDataTypes";
 
 const style = {
