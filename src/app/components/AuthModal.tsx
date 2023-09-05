@@ -6,10 +6,12 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import AuthModelInput from "./AuthModelInput";
-import { useForm } from "react-hook-form";
+import { FieldErrors, UseFormRegister, useForm } from "react-hook-form";
 import useAuth from "@/hooks/useAuth";
 import useAuthContext from "@/hooks/useAuthContext";
 import { Alert, CircularProgress } from "@mui/material";
+import { type } from "os";
+import { FormData } from "../../../formDataTypes";
 
 const style = {
   position: "absolute" as "absolute",
@@ -28,11 +30,12 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm<FormData>();
 
   const { signin, signup } = useAuth();
 
@@ -40,7 +43,7 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
     return isSignIn ? signInContent : signUpContent;
   };
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: FormData) => {
     isSignIn ? signin(data) : signup(data);
   };
 
