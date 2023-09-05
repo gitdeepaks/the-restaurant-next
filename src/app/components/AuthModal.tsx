@@ -34,14 +34,14 @@ export default function AuthModal({ isSignIn }: { isSignIn: boolean }) {
     formState: { errors },
   } = useForm();
 
-  const { signin } = useAuth();
+  const { signin, signup } = useAuth();
 
   const renderContent = (signInContent: string, signUpContent: string) => {
     return isSignIn ? signInContent : signUpContent;
   };
 
   const onSubmit = (data: any) => {
-    isSignIn ? signin(data) : console.log("sign up", data);
+    isSignIn ? signin(data) : signup(data);
   };
 
   return (
