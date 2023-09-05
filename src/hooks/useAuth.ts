@@ -1,8 +1,7 @@
 import { FormData } from "../../formDataTypes";
 import axios from "axios";
 import useAuthContext from "./useAuthContext";
-import { use } from "react";
-
+import { deleteCookie } from "cookies-next";
 const useAuth = () => {
   const { loading, data, error, setAuthState } = useAuthContext();
 
@@ -61,6 +60,15 @@ const useAuth = () => {
     }
   };
 
-  return { signin, signup };
+  const signout = () => {
+    deleteCookie("jwt");
+    setAuthState({
+      data: null,
+      error: null,
+      loading: false,
+    });
+  };
+
+  return { signin, signup, signout };
 };
 export default useAuth;
