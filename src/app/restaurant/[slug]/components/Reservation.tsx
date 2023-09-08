@@ -1,12 +1,18 @@
 "use client";
 
-import { partySize } from "@/data";
+import { partySize, times } from "@/data";
 import { useState } from "react";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-function Reservation() {
+function Reservation({
+  openTime,
+  closeTime,
+}: {
+  openTime: string;
+  closeTime: string;
+}) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const handleDateChange = (date: Date | null) => {
@@ -14,6 +20,28 @@ function Reservation() {
       return setSelectedDate(date);
     }
     return setSelectedDate(null);
+  };
+
+  const filterTimes = () => {
+    // opentime 12:30:00.000Z
+    // closetime 22:00:00.000Z
+
+    const timeRange: typeof times = [];
+    let isInTimeRange = false;
+
+    times.forEach((time) => {
+      if (time.time === openTime) {
+        isInTimeRange = true;
+      }
+      if (isInTimeRange) {
+        timeRange.push(time);
+      }
+      if (time.time === closeTime) {
+        isInTimeRange = false;
+      }
+    });
+
+    return timeRange;
   };
   return (
     <div className="w-[27%] relative text-reg">
@@ -38,14 +66,17 @@ function Reservation() {
               selected={selectedDate}
               onChange={handleDateChange}
               className="py-3 w-28 border-bottom font-light text-reg"
-              dateFormat="MM/dd/yyyy"
+              dateFormat="MMMM d"
             />
           </div>
           <div className="flex flex-col w-[48%]">
             <label htmlFor="">Time</label>
             <select name="" id="" className="py-3 border-b font-light">
-              <option value="">7:30 AM</option>
-              <option value="">9:30 AM</option>
+              {filterTimes().map((time) => (
+                <option value={time.time} key={time.time}>
+                  {time.displayTime}
+                </option>
+              ))}
             </select>
           </div>
         </div>
