@@ -19,7 +19,7 @@ export async function GET(
   if (!partySize || !bookingTime || !bookingDate) {
     return NextResponse.json(
       {
-        error: `One or more required fields are missing: PartySize=${partySize}, BookingTime=${bookingTime}, BookingDate=${bookingDate}`,
+        error: `One or more required fields are missing: partySize=${partySize}, time=${bookingTime}, date=${bookingDate}`,
       },
       { status: 400 }
     );
