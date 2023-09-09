@@ -11,9 +11,9 @@ export async function GET(
   const { slug } = params;
 
   // Extract query parameters
-  const partySize = req.nextUrl.searchParams.get("partySize");
-  const bookingTime = req.nextUrl.searchParams.get("bookingTime");
-  const bookingDate = req.nextUrl.searchParams.get("bookingDate");
+  const partySize = req.nextUrl.searchParams.get("partySize") as string;
+  const bookingTime = req.nextUrl.searchParams.get("time") as string;
+  const bookingDate = req.nextUrl.searchParams.get("date") as string;
 
   // Validate query parameters
   if (!partySize || !bookingTime || !bookingDate) {
@@ -28,7 +28,7 @@ export async function GET(
   // Find the matching time
   const searchedTimes = times.find((t) => {
     return t.time === bookingTime;
-  });
+  })?.searchTimes;
 
   if (!searchedTimes) {
     return NextResponse.json(
@@ -41,43 +41,17 @@ export async function GET(
 
   // ... your existing code ...
 
-  const rawBookingDate = req.nextUrl.searchParams.get("bookingDate");
-  if (!rawBookingDate) {
-    return NextResponse.json(
-      {
-        error: `Booking date is missing or invalid.`,
-      },
-      { status: 400 }
-    );
-  }
-
-  const bookingDateFormatted = `${rawBookingDate.slice(
-    4,
-    8
-  )}-${rawBookingDate.slice(0, 2)}-${rawBookingDate.slice(2, 4)}`;
-
-  const rawBookingTime = req.nextUrl.searchParams.get("bookingTime");
-  if (!rawBookingTime) {
-    return NextResponse.json(
-      {
-        error: `Booking time is missing or invalid.`,
-      },
-      { status: 400 }
-    );
-  }
-  const bookingTimeFormatted = rawBookingTime.split("T")[1].slice(0, 5);
-
   // Now use bookingDateFormatted and bookingTimeFormatted in your database query:
-  const gteDate = new Date(`${bookingDateFormatted}T${bookingTimeFormatted}`);
-  const lteDate = new Date(`${bookingDateFormatted}T${bookingTimeFormatted}`); // Adjust this if necessary
 
   // try {
   // Fetch bookings from the database
   const bookings = await prisma.booking.findMany({
     where: {
       booking_time: {
-        gte: gteDate,
-        lte: lteDate,
+        gte: new Date(`${bookingDate}T${searchedTimes[0]}`),
+        lte: new Date(
+          `${bookingDate}T${searchedTimes[searchedTimes.length - 1]}`
+        ),
       },
     },
     select: {
@@ -112,9 +86,9 @@ export async function GET(
 
   const resTable = restaurant?.tables;
 
-  const searchTimesWithTable = searchedTimes.searchTimes.map((time) => {
+  const searchTimesWithTable = searchedTimes.map((time) => {
     return {
-      date: new Date(`${bookingDateFormatted}T${time}`),
+      date: new Date(`${bookingDate}T${time}`),
       time,
       tables: resTable,
     };
