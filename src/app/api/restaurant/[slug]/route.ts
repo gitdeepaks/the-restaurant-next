@@ -39,11 +39,6 @@ export async function GET(
     );
   }
 
-  // ... your existing code ...
-
-  // Now use bookingDateFormatted and bookingTimeFormatted in your database query:
-
-  // try {
   // Fetch bookings from the database
   const bookings = await prisma.booking.findMany({
     where: {
