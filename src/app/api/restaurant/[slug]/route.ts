@@ -76,6 +76,8 @@ export async function GET(
     },
     select: {
       tables: true,
+      open_time: true,
+      close_time: true,
     },
   });
 
@@ -101,6 +103,28 @@ export async function GET(
     });
   });
 
+  const availablities = searchTimesWithTable
+    .map((t) => {
+      const totalSeats = t.tables?.reduce((total, table) => {
+        return total + table.seats;
+      }, 0);
+
+      return {
+        time: t.time,
+        available: (totalSeats as number) >= parseInt(partySize),
+      };
+    })
+    .filter((availablity) => {
+      const timeAfterOpeningHour =
+        new Date(`${bookingDate}T${availablity.time}`) >=
+        new Date(`${bookingDate}T${restaurant?.open_time}`);
+      const timeBeforeClosingHour =
+        new Date(`${bookingDate}T${availablity.time} `) <=
+        new Date(`${bookingDate}T${restaurant?.close_time}`);
+
+      return timeAfterOpeningHour && timeBeforeClosingHour;
+    });
+
   return NextResponse.json(
     {
       searchedTimes,
@@ -108,6 +132,7 @@ export async function GET(
       bookingTableObj,
       resTable,
       searchTimesWithTable,
+      availablities,
     },
     { status: 200 }
   );
