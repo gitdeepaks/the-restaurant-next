@@ -91,13 +91,13 @@ export async function GET(
 
   searchTimesWithTable.forEach((t) => {
     t.tables = t.tables?.filter((table) => {
-      if (!bookingTableObj[t.date.toISOString()]) {
-        if (bookingTableObj[t.date.toISOString()][table.id]) {
-          return false;
-        } else {
-          return true;
-        }
+      if (
+        bookingTableObj[t.date.toISOString()] &&
+        bookingTableObj[t.date.toISOString()][table.id]
+      ) {
+        return false;
       }
+      return true;
     });
   });
 
