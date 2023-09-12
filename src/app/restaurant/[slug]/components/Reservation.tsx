@@ -2,6 +2,8 @@
 
 import { partySize, times } from "@/data";
 import useAvailablities from "@/hooks/useAvailablities";
+import { convertToDisplayTime } from "@/utils/convertToDisplayTime";
+import { CircularProgress } from "@mui/material";
 import { useState, useRef } from "react";
 
 import DatePicker from "react-datepicker";
@@ -74,7 +76,7 @@ function Reservation({
 
   return (
     <div className="w-[27%] relative text-reg">
-      <div className="fixed w-[15%] bg-white rounded p-3 shadow">
+      <div className="bg-white rounded p-3 shadow">
         <div className="text-center border-b pb-2 font-bold">
           <h4 className="mr-7 text-lg">Make a Reservation</h4>
         </div>
@@ -125,12 +127,29 @@ function Reservation({
 
         <div className="mt-5">
           <button
-            className="bg-red-600 rounded w-full px-4 text-white font-bold h-16"
+            className="bg-red-600 rounded w-full px-4 text-white font-bold h-16 disabled:bg-gray-600"
             onClick={handleSubmit}
+            disabled={loaging}
           >
-            Find a Time
+            {loaging ? <CircularProgress color="inherit" /> : "Find a Table"}
           </button>
         </div>
+        {data?.length ? (
+          <div className="mt-4">
+            <p className="text-reg">Select a time</p>
+            <div className="flex flex-wrap mt-2">
+              {data.map((time) => {
+                return time.available ? (
+                  <div className="bg-red-600 cursor-pointer p-2 w-24 text-center text-white mb-3 mr-3 rounded">
+                    {convertToDisplayTime(time.time)}
+                  </div>
+                ) : (
+                  <div className="bg-gray-600 p-2 w-24 mb-3 mr-3"></div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

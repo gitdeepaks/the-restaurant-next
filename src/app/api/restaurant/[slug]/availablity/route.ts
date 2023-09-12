@@ -126,14 +126,15 @@ export async function GET(
     });
 
   return NextResponse.json(
-    {
-      searchedTimes,
-      bookings,
-      bookingTableObj,
-      resTable,
-      searchTimesWithTable,
-      availablities,
-    },
+    availablities,
+    // {
+    //   searchedTimes,
+    //   bookings,
+    //   bookingTableObj,
+    //   resTable,
+    //   searchTimesWithTable,
+    //   availablities,
+    // },
     { status: 200 }
   );
 }
