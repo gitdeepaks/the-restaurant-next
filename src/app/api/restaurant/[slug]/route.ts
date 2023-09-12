@@ -119,7 +119,7 @@ export async function GET(
         new Date(`${bookingDate}T${availablity.time}`) >=
         new Date(`${bookingDate}T${restaurant?.open_time}`);
       const timeBeforeClosingHour =
-        new Date(`${bookingDate}T${availablity.time} `) <=
+        new Date(`${bookingDate}T${availablity.time}`) <=
         new Date(`${bookingDate}T${restaurant?.close_time}`);
 
       return timeAfterOpeningHour && timeBeforeClosingHour;

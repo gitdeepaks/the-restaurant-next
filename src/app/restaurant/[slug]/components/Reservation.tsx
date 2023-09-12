@@ -28,6 +28,8 @@ function Reservation({
 
   const timeSizeSelectRef = useRef<HTMLSelectElement>(null);
 
+  console.log({ data });
+
   const handleDateChange = (date: Date | null) => {
     if (date) {
       setDate(date.toISOString().split("T")[0]);
@@ -56,18 +58,18 @@ function Reservation({
   };
 
   const handleSubmit = () => {
-    // fetchAvailablities({
-    //   slug,
-    //   date,
-    //   partySize: String(partySizeSelectRef.current?.value),
-    //   time: String(timeSizeSelectRef.current?.value),
-    // });
-    console.log({
+    fetchAvailablities({
       slug,
       date,
       partySize: String(partySizeSelectRef.current?.value),
       time: String(timeSizeSelectRef.current?.value),
     });
+    // console.log({
+    //   slug,
+    //   date,
+    //   partySize: String(partySizeSelectRef.current?.value),
+    //   time: String(timeSizeSelectRef.current?.value),
+    // });
   };
 
   return (
