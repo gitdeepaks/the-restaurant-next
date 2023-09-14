@@ -93,11 +93,11 @@ export async function GET(
   }
 
   return NextResponse.json({
-    // slug,
-    // partySize,
-    // bookingTime,
-    // bookingDate,
-    // searchTimesWithTable,
+    slug,
+    partySize,
+    bookingTime,
+    bookingDate,
+    searchTimesWithTable,
     availableTables,
   });
 }
