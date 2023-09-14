@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { times } from "@/data";
+import { findAvailableTables } from "@/utils/findAvailableTables";
 
 const prisma = new PrismaClient();
 
@@ -25,12 +26,47 @@ export async function GET(
     );
   }
 
-  // Find the matching time
-  const searchedTimes = times.find((t) => {
-    return t.time === bookingTime;
-  })?.searchTimes;
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      slug,
+    },
+    select: {
+      tables: {
+        select: {
+          id: true,
+          seats: true,
+          restaurant_id: true,
+        },
+      },
+      open_time: true,
+      close_time: true,
+    },
+  });
 
-  if (!searchedTimes) {
+  if (!restaurant) {
+    return NextResponse.json(
+      {
+        error: `Restaurant not found`,
+      },
+      { status: 404 }
+    );
+  }
+
+  // Transform the restaurant data to match the expected type
+  const transformedRestaurant = {
+    ...restaurant,
+    opening_time: restaurant.open_time,
+    closing_time: restaurant.close_time,
+  };
+
+  const searchTimesWithTable = await findAvailableTables({
+    slug,
+    bookingDate,
+    bookingTime,
+    restaurant: transformedRestaurant,
+  });
+
+  if (!searchTimesWithTable) {
     return NextResponse.json(
       {
         error: `No matching times found for BookingTime=${bookingTime}`,
@@ -39,70 +75,7 @@ export async function GET(
     );
   }
 
-  // Fetch bookings from the database
-  const bookings = await prisma.booking.findMany({
-    where: {
-      booking_time: {
-        gte: new Date(`${bookingDate}T${searchedTimes[0]}`),
-        lte: new Date(
-          `${bookingDate}T${searchedTimes[searchedTimes.length - 1]}`
-        ),
-      },
-    },
-    select: {
-      number_of_people: true,
-      booking_time: true,
-      tables: true,
-    },
-  });
-
-  const bookingTableObj: { [key: string]: { [key: number]: true } } = {};
-
-  bookings.forEach((booking) => {
-    bookingTableObj[booking.booking_time.toISOString()] = booking.tables.reduce(
-      (obj, table) => {
-        return {
-          ...obj,
-          [table.table_id]: true,
-        };
-      },
-      {}
-    );
-  });
-
-  const restaurant = await prisma.restaurant.findUnique({
-    where: {
-      slug,
-    },
-    select: {
-      tables: true,
-      open_time: true,
-      close_time: true,
-    },
-  });
-
-  const resTable = restaurant?.tables;
-
-  const searchTimesWithTable = searchedTimes.map((time) => {
-    return {
-      date: new Date(`${bookingDate}T${time}`),
-      time,
-      tables: resTable,
-    };
-  });
-
-  searchTimesWithTable.forEach((t) => {
-    t.tables = t.tables?.filter((table) => {
-      if (
-        bookingTableObj[t.date.toISOString()] &&
-        bookingTableObj[t.date.toISOString()][table.id]
-      ) {
-        return false;
-      }
-      return true;
-    });
-  });
-
+  //
   const availablities = searchTimesWithTable
     .map((t) => {
       const totalSeats = t.tables?.reduce((total, table) => {
