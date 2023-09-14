@@ -17,15 +17,15 @@ model Restaurant {
   close_time  String
   slug        String    @unique
   price       PRICE
-  items       Item[]
   location_id Int
-  location    Location  @relation(fields: [location_id], references: [id])
   region_id   Int
-  region      Region    @relation(fields: [region_id], references: [id])
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
-  reviews     Review[]
   bookings    Booking[]
+  items       Item[]
+  location    Location  @relation(fields: [location_id], references: [id])
+  region      Region    @relation(fields: [region_id], references: [id])
+  reviews     Review[]
   tables      Table[]
 }
 
@@ -35,25 +35,25 @@ model Item {
   price         String
   description   String
   restaurant_id Int
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [id])
   created_at    DateTime   @default(now())
   updated_at    DateTime   @updatedAt
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [id])
 }
 
 model Location {
   id         Int          @id @default(autoincrement())
   name       String
-  restaurant Restaurant[]
   created_at DateTime     @default(now())
   updated_at DateTime     @updatedAt
+  restaurant Restaurant[]
 }
 
 model Region {
   id          Int          @id @default(autoincrement())
   name        String
-  restaurants Restaurant[]
   created_at  DateTime     @default(now())
   updated_at  DateTime     @updatedAt
+  restaurants Restaurant[]
 }
 
 model User {
@@ -76,15 +76,9 @@ model Review {
   text          String
   rating        Float
   restaurant_id Int
-  restaurant    Restaurant @relation(fields: [restaurant_id], references: [id])
   user_id       Int
+  restaurant    Restaurant @relation(fields: [restaurant_id], references: [id])
   user          User       @relation(fields: [user_id], references: [id])
-}
-
-enum PRICE {
-  CHEAP
-  REGULAR
-  EXPENSIVE
 }
 
 model Booking {
@@ -98,27 +92,33 @@ model Booking {
   booker_occasion   String
   booker_request    String
   restaurant_id     Int
-  restaurant        Restaurant       @relation(fields: [restaurant_id], references: [id])
-  tables            BookingOnTable[]
   created_at        DateTime         @default(now())
   updated_at        DateTime         @updatedAt
+  restaurant        Restaurant       @relation(fields: [restaurant_id], references: [id])
+  tables            BookingOnTable[]
 }
 
 model Table {
   id            Int              @id @default(autoincrement())
   seats         Int
   restaurant_id Int
-  restaurant    Restaurant       @relation(fields: [restaurant_id], references: [id])
   bookings      BookingOnTable[]
+  restaurant    Restaurant       @relation(fields: [restaurant_id], references: [id])
 }
 
 model BookingOnTable {
   booking_id Int
-  booking    Booking  @relation(fields: [booking_id], references: [id])
   table_id   Int
-  restaurant Table    @relation(fields: [table_id], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  booking    Booking  @relation(fields: [booking_id], references: [id])
+  restaurant Table    @relation(fields: [table_id], references: [id])
 
   @@id([booking_id, table_id])
+}
+
+enum PRICE {
+  CHEAP
+  REGULAR
+  EXPENSIVE
 }
