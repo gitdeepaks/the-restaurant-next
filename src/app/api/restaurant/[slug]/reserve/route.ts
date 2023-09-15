@@ -4,7 +4,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(
+interface bookingData {
+  bookerEmail: string;
+  bookerPhone: string;
+  bookerFirstName: string;
+  bookerLastName: string;
+  bookerOccasion: string;
+  bookerRequest: string;
+}
+
+export async function POST(
   req: NextRequest,
   { params }: { params: { slug: string } }
 ) {
@@ -15,9 +24,19 @@ export async function GET(
   const bookingTime = req.nextUrl.searchParams.get("time") as string;
   const bookingDate = req.nextUrl.searchParams.get("date") as string;
 
+  const {
+    bookerEmail,
+    bookerFirstName,
+    bookerLastName,
+    bookerOccasion,
+    bookerRequest,
+    bookerPhone,
+  }: bookingData = await req.json();
+
   const restaurant = await prisma.restaurant.findUnique({
     where: { slug },
     select: {
+      id: true,
       tables: {
         select: {
           id: true,
@@ -147,14 +166,40 @@ export async function GET(
     }
   }
 
-  return NextResponse.json({
-    // slug,
-    // partySize,
-    // bookingTime,
-    // bookingDate,
-    // searchTimesWithTable,
-    // availableTables,
-    availableTablesWithSeats,
-    tablesToBook,
+  const booking = await prisma.booking.create({
+    data: {
+      number_of_people: parseInt(partySize),
+      booker_email: bookerEmail,
+      booker_first_name: bookerFirstName,
+      booker_last_name: bookerLastName,
+      booker_occasion: bookerOccasion,
+      booker_request: bookerRequest,
+      booker_phone: bookerPhone,
+      booking_time: new Date(`${bookingDate}T${bookingTime}`),
+      restaurant_id: restaurant.id,
+    },
   });
+
+  const bookingOnTableData = tablesToBook.map((tableId) => {
+    return {
+      booking_id: booking.id,
+      table_id: tableId,
+    };
+  });
+
+  await prisma.bookingOnTable.createMany({
+    data: bookingOnTableData,
+  });
+
+  return NextResponse.json(booking);
 }
+
+/*
+"bookerEmail": "test@yahoo.com",
+  "bookerPhone": "1234567890",
+  "bookerFirstName": "test123",
+  "bookerLastName": "test123ln",
+  "bookerOccasion": "birthday",
+  "bookerRequest": "test request cake",
+
+  */
