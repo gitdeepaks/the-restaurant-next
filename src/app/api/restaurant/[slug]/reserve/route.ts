@@ -1,7 +1,7 @@
 import { findAvailableTables } from "@/utils/findAvailableTables";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-import { parse } from "path";
+
 const prisma = new PrismaClient();
 
 export async function GET(
@@ -31,10 +31,10 @@ export async function GET(
   });
 
   if (!restaurant) {
-    return (
-      NextResponse.json({
+    return NextResponse.json(
+      {
         errorMessage: `Restaurant with slug ${slug} not found`,
-      }),
+      },
       {
         status: 404,
       }
@@ -47,12 +47,14 @@ export async function GET(
     new Date(`${bookingDate}T${bookingTime}`) >
       new Date(`${bookingDate}T${restaurant.close_time}`)
   ) {
-    NextResponse.json({
-      errorMessage: `Restaurant is not open at ${bookingTime} on ${bookingDate}`,
-    }),
+    return NextResponse.json(
+      {
+        errorMessage: `Restaurant is not open at ${bookingTime} on ${bookingDate}`,
+      },
       {
         status: 404,
-      };
+      }
+    );
   }
 
   const transformedRestaurant = {
@@ -109,6 +111,18 @@ export async function GET(
     }
   });
 
+  const totalSeatsAvailable =
+    availableTablesWithSeats[2].length * 2 +
+    availableTablesWithSeats[4].length * 4;
+  if (totalSeatsAvailable < parseInt(partySize)) {
+    return NextResponse.json(
+      {
+        error: `Not enough seats available for partySize=${partySize}`,
+      },
+      { status: 404 }
+    );
+  }
+
   const tablesToBook: number[] = [];
 
   let seatRemaining = parseInt(partySize);
@@ -118,17 +132,17 @@ export async function GET(
       if (availableTablesWithSeats[4].length) {
         tablesToBook.push(availableTablesWithSeats[4][0]);
         availableTablesWithSeats[4].shift();
-        seatRemaining - 4;
+        seatRemaining -= 4;
       } else {
         tablesToBook.push(availableTablesWithSeats[2][0]);
         availableTablesWithSeats[2].shift();
-        seatRemaining - 2;
+        seatRemaining -= 2;
       }
     } else {
       if (availableTablesWithSeats[2].length) {
         tablesToBook.push(availableTablesWithSeats[2][0]);
         availableTablesWithSeats[2].shift();
-        seatRemaining - 2;
+        seatRemaining -= 2;
       }
     }
   }
