@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { times } from "@/data";
 import { findAvailableTables } from "@/utils/findAvailableTables";
 
 const prisma = new PrismaClient();
@@ -10,34 +9,25 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   const { slug } = params;
-
-  // Extract query parameters
-  const partySize = req.nextUrl.searchParams.get("partySize") as string;
+  const partySize = parseInt(
+    req.nextUrl.searchParams.get("partySize") as string
+  );
   const bookingTime = req.nextUrl.searchParams.get("time") as string;
   const bookingDate = req.nextUrl.searchParams.get("date") as string;
 
-  // Validate query parameters
-  if (!partySize || !bookingTime || !bookingDate) {
+  if (isNaN(partySize) || !bookingTime || !bookingDate) {
     return NextResponse.json(
       {
-        error: `One or more required fields are missing: partySize=${partySize}, time=${bookingTime}, date=${bookingDate}`,
+        error: `One or more required fields are missing or invalid: partySize=${partySize}, time=${bookingTime}, date=${bookingDate}`,
       },
       { status: 400 }
     );
   }
 
   const restaurant = await prisma.restaurant.findUnique({
-    where: {
-      slug,
-    },
+    where: { slug },
     select: {
-      tables: {
-        select: {
-          id: true,
-          seats: true,
-          restaurant_id: true,
-        },
-      },
+      tables: { select: { id: true, seats: true, restaurant_id: true } },
       open_time: true,
       close_time: true,
     },
@@ -45,28 +35,30 @@ export async function GET(
 
   if (!restaurant) {
     return NextResponse.json(
-      {
-        error: `Restaurant not found`,
-      },
+      { error: `Restaurant not found` },
       { status: 404 }
     );
   }
+  let availableTimes;
+  try {
+    availableTimes = await findAvailableTables({
+      slug,
+      bookingDate,
+      bookingTime,
+      restaurant: {
+        opening_time: restaurant.open_time,
+        closing_time: restaurant.close_time,
+        tables: restaurant.tables,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { errorMessage: `Error finding available tables ${error}` },
+      { status: 500 }
+    );
+  }
 
-  // Transform the restaurant data to match the expected type
-  const transformedRestaurant = {
-    ...restaurant,
-    opening_time: restaurant.open_time,
-    closing_time: restaurant.close_time,
-  };
-
-  const searchTimesWithTable = await findAvailableTables({
-    slug,
-    bookingDate,
-    bookingTime,
-    restaurant: transformedRestaurant,
-  });
-
-  if (!searchTimesWithTable) {
+  if (!availableTimes) {
     return NextResponse.json(
       {
         error: `No matching times found for BookingTime=${bookingTime}`,
@@ -75,39 +67,21 @@ export async function GET(
     );
   }
 
-  //
-  const availablities = searchTimesWithTable
+  const availabilities = availableTimes
     .map((t) => {
-      const totalSeats = t.tables?.reduce((total, table) => {
-        return total + table.seats;
-      }, 0);
-
+      const totalSeats =
+        t.tables?.reduce((total, table) => total + table.seats, 0) ?? 0;
       return {
         time: t.time,
-        available: (totalSeats as number) >= parseInt(partySize),
+        available: totalSeats >= partySize,
       };
     })
-    .filter((availablity) => {
-      const timeAfterOpeningHour =
-        new Date(`${bookingDate}T${availablity.time}`) >=
-        new Date(`${bookingDate}T${restaurant?.open_time}`);
-      const timeBeforeClosingHour =
-        new Date(`${bookingDate}T${availablity.time}`) <=
-        new Date(`${bookingDate}T${restaurant?.close_time}`);
-
-      return timeAfterOpeningHour && timeBeforeClosingHour;
+    .filter((availability) => {
+      const currentTime = new Date(`${bookingDate}T${availability.time}`);
+      const openTime = new Date(`${bookingDate}T${restaurant.open_time}`);
+      const closeTime = new Date(`${bookingDate}T${restaurant.close_time}`);
+      return currentTime >= openTime && currentTime <= closeTime;
     });
 
-  return NextResponse.json(
-    availablities,
-    // {
-    //   searchedTimes,
-    //   bookings,
-    //   bookingTableObj,
-    //   resTable,
-    //   searchTimesWithTable,
-    //   availablities,
-    // },
-    { status: 200 }
-  );
+  return NextResponse.json(availabilities, { status: 200 });
 }
