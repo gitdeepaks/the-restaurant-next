@@ -1,6 +1,7 @@
 import { findAvailableTables } from "@/utils/findAvailableTables";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { parse } from "path";
 const prisma = new PrismaClient();
 
 export async function GET(
@@ -92,12 +93,54 @@ export async function GET(
     );
   }
 
+  const availableTablesWithSeats: {
+    2: number[];
+    4: number[];
+  } = {
+    2: [],
+    4: [],
+  };
+
+  availableTables.tables.forEach((table) => {
+    if (table.seats === 2) {
+      availableTablesWithSeats[2].push(table.id);
+    } else {
+      availableTablesWithSeats[4].push(table.id);
+    }
+  });
+
+  const tablesToBook: number[] = [];
+
+  let seatRemaining = parseInt(partySize);
+
+  while (seatRemaining > 0) {
+    if (seatRemaining >= 3) {
+      if (availableTablesWithSeats[4].length) {
+        tablesToBook.push(availableTablesWithSeats[4][0]);
+        availableTablesWithSeats[4].shift();
+        seatRemaining - 4;
+      } else {
+        tablesToBook.push(availableTablesWithSeats[2][0]);
+        availableTablesWithSeats[2].shift();
+        seatRemaining - 2;
+      }
+    } else {
+      if (availableTablesWithSeats[2].length) {
+        tablesToBook.push(availableTablesWithSeats[2][0]);
+        availableTablesWithSeats[2].shift();
+        seatRemaining - 2;
+      }
+    }
+  }
+
   return NextResponse.json({
-    slug,
-    partySize,
-    bookingTime,
-    bookingDate,
-    searchTimesWithTable,
-    availableTables,
+    // slug,
+    // partySize,
+    // bookingTime,
+    // bookingDate,
+    // searchTimesWithTable,
+    // availableTables,
+    availableTablesWithSeats,
+    tablesToBook,
   });
 }
