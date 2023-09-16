@@ -50,7 +50,7 @@ export default async function RestaurantMenuPage({
       <div className="border-t h-screen">
         <div className="py-9 w-3/5 m-auto">
           <Header searchParams={searchParams} restaurant={restaurantt} />
-          <Form />
+          <Form searchParams={searchParams} slug={params.slug} />
         </div>
       </div>
     </>
