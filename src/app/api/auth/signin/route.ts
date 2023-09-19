@@ -13,7 +13,7 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Response) {
+export async function POST(request: NextResponse) {
   const res: FormData = await request.json();
 
   const errors: string[] = [];
