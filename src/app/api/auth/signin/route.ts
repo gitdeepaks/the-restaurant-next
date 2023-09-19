@@ -14,7 +14,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const res: FormData = request.body;
+  const res: FormData = await request.json();
 
   const errors: string[] = [];
 
