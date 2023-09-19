@@ -1,7 +1,7 @@
 import validator from "validator";
 import { FormData } from "../../../../../formDataTypes";
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcrypt";
 import * as jose from "jose";
 
@@ -13,8 +13,8 @@ export async function GET() {
   });
 }
 
-export async function POST(request: NextResponse) {
-  const res: FormData = await request.json();
+export async function POST(request: NextRequest) {
+  const res: FormData = request.body;
 
   const errors: string[] = [];
 
